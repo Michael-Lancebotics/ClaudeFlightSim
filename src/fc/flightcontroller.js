@@ -67,10 +67,14 @@ export class FlightController {
     this.missionSpeed = this.p.AIRSPEED_CRUISE;
     this.rtl = null;
     this.releaseRequest = false;
+    this.lastPusher = 0;
     this.rcLostTime = 0;
     this.failsafe = { rc: false, battLow: false, battCrit: false };
     this.out = { lift: [0, 0, 0, 0], pusher: 0, ailL: 0, ailR: 0, rvL: 0, rvR: 0 };
-    this.status = {};
+    this.status = {
+      mode: this.mode, armed: false, phase: 'vtol', transition: 'VTOL', transitionPct: null, assist: false,
+      landed: true, missionItem: '', failsafe: { rc: false, battLow: false, battCrit: false }, home: [0, 0],
+    };
     this.vAtt.reset();
     this.vPos.reset();
     this.fwAtt.reset();
@@ -180,6 +184,7 @@ export class FlightController {
 
     const out = this.out;
     if (!this.armed) {
+      this.lastPusher = 0;
       this.disarmedOutputs(est, pilot);
       this.updateStatus(est);
       return out;
@@ -193,6 +198,12 @@ export class FlightController {
 
     // --- outputs
     this.computeOutputs(dt, est, dmd);
+    // THR_SLEWRATE: limit how fast the pusher throttle may change
+    const slew = (p.THR_SLEWRATE / 100) * dt;
+    if (p.THR_SLEWRATE > 0 && !dmd.manual) {
+      out.pusher = clamp(out.pusher, this.lastPusher - slew, this.lastPusher + slew);
+    }
+    this.lastPusher = out.pusher;
     this.updateStatus(est, dmd);
     return out;
   }

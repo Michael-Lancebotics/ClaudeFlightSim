@@ -46,6 +46,7 @@ export const DEFAULT_FC_PARAMS = {
   // ---- fixed wing
   THR_MAX: 80, // [SIM] % - keeps the pusher near its 85 A rating when static
   THR_MIN: 0,
+  THR_SLEWRATE: 100, // %/s pusher throttle slew limit
   LIM_ROLL_CD: 45, // deg (name kept for familiarity)
   LIM_PITCH_MAX: 20,
   LIM_PITCH_MIN: -25,
@@ -96,6 +97,7 @@ export const PARAM_INFO = {
   Q_FWD_THR_USE: 'Use pusher in VTOL modes (0 off, 1 position modes, 2 all)',
   Q_WVANE_ENABLE: 'Weathervane into wind in position modes (0/1)',
   THR_MAX: 'Max pusher throttle (%)',
+  THR_SLEWRATE: 'Pusher throttle slew limit (%/s)',
   LIM_ROLL_CD: 'Max fixed-wing bank angle (deg)',
   LIM_PITCH_MAX: 'Max fixed-wing pitch up (deg)',
   LIM_PITCH_MIN: 'Max fixed-wing pitch down (deg)',
