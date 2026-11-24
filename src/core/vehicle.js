@@ -37,7 +37,7 @@ export class Vehicle {
     this.liftAero = new LiftRotorAero(ac.liftRotor);
     this.liftMotor = new Motor(ac.liftMotor);
     this.pusherAero = new PusherAero(ac.pusher);
-    this.pusherMotor = new Motor({ ...ac.pusherMotor, brakeCurrent: 10 });
+    this.pusherMotor = new Motor({ ...ac.pusherMotor, brakeCurrent: 0 }); // ESC brake off: prop freewheels
     this.battery = new Battery(ac.battery);
     this.I = [ac.Ixx, 0, -ac.Ixz, 0, ac.Iyy, 0, -ac.Ixz, 0, ac.Izz];
     this.Iinv = mat3Inverse(this.I);

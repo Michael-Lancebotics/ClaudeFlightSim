@@ -9,19 +9,20 @@ const RPM_PER_RADS = 60 / (2 * Math.PI);
 
 // ====================================================================== motor + ESC
 export class Motor {
-  constructor({ kv, resistance, noLoadCurrent, escEfficiency, brakeCurrent = 15 }) {
+  constructor({ kv, resistance, noLoadCurrent, escEfficiency, brakeCurrent = 15, escMaxCurrent = 1e9 }) {
     this.kvRad = kv / RPM_PER_RADS; // rad/s per volt
     this.kt = 1 / this.kvRad; // N m / A
     this.R = resistance;
     this.I0 = noLoadCurrent;
     this.eta = escEfficiency;
     this.brakeCurrent = brakeCurrent;
+    this.maxCurrent = escMaxCurrent;
   }
 
   /** Winding current for ESC duty d (0..1), bus voltage and shaft speed (rad/s). */
   current(d, vBus, omega) {
     const I = (d * vBus - omega / this.kvRad) / this.R;
-    return Math.max(I, -this.brakeCurrent);
+    return clamp(I, -this.brakeCurrent, this.maxCurrent);
   }
 
   /** Net torque delivered to the shaft (electromagnetic minus friction/iron loss). */

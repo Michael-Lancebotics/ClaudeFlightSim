@@ -130,6 +130,7 @@ export const AIRCRAFT = {
     resistance: 0.034, // [EST] ohm (not supplied for the X3525)
     noLoadCurrent: 1.0, // [EST] A
     escEfficiency: 0.96, // [EST]
+    escMaxCurrent: 60, // [EST] A, ESC current limit (start-up inrush)
   },
 
   // ------------------------------------------------------------ pusher
@@ -151,8 +152,9 @@ export const AIRCRAFT = {
     kv: 520, // [USER]
     resistance: 0.0129, // [USER]
     noLoadCurrent: 2.5, // [USER]
-    maxCurrent: 85, // [USER]
+    maxCurrent: 85, // [USER] motor rating (warning threshold)
     escEfficiency: 0.96, // [EST]
+    escMaxCurrent: 120, // [USER] Hobbywing 120 A ESC
   },
   cruiseCalib: { V: 20.8, power: 365, rho: 1.083 }, // [USER] design point
 
