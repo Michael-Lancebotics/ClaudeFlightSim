@@ -102,6 +102,10 @@ export class Hud {
     this.markerTxt = this.marker.querySelector('.hud-marker-txt');
     this.swMarker = el('div', 'hud-marker hud-swmarker', r, '<div class="hud-marker-box"></div><div class="hud-marker-txt">swimmer</div>');
     this.swMarkerTxt = this.swMarker.querySelector('.hud-marker-txt');
+    this.dropMarker = el('div', 'hud-marker hud-dropmarker', r, '<div class="hud-marker-box"></div><div class="hud-marker-txt"></div>');
+    this.dropMarkerTxt = this.dropMarker.querySelector('.hud-marker-txt');
+    this.cross = el('div', 'hud-cross', r, '<div class="hud-cross-h"></div><div class="hud-cross-v"></div><div class="hud-cross-txt"></div>');
+    this.crossTxt = this.cross.querySelector('.hud-cross-txt');
     // warnings + crash
     this.warn = el('div', 'hud-warn', r, '');
     this.crashEl = el('div', 'hud-crash hidden', r, '');
@@ -195,7 +199,13 @@ export class Hud {
 
       // input monitor
       this.inputEl.textContent = ctx.inputLabel;
-      this.camEl.textContent = CAMERA_LABELS[ctx.cameraMode] + (ctx.cameraMode === 'los' ? ` · FOV ${ctx.fov.toFixed(0)}° (mouse wheel / +- to zoom)` : '') + (ctx.timeScale !== 1 ? ` · TIME x${ctx.timeScale}` : '');
+      let camExtra = '';
+      if (ctx.cameraMode === 'los') camExtra = ` · FOV ${ctx.fov.toFixed(0)}° (mouse wheel / +- to zoom)`;
+      if (ctx.cameraMode === 'down') camExtra = ` · ${ctx.downStabilized ? 'gimbal, straight down' : 'fixed to the airframe'} (K to switch) · FOV ${ctx.fov.toFixed(0)}° (wheel)`;
+      this.camEl.textContent = CAMERA_LABELS[ctx.cameraMode] + camExtra + (ctx.timeScale !== 1 ? ` · TIME x${ctx.timeScale}` : '');
+      const down = ctx.cameraMode === 'down';
+      this.cross.style.display = down ? 'block' : 'none';
+      if (down) this.crossTxt.textContent = `${tel.hagl.toFixed(1)} m above ${tel.est.onGround ? 'ground' : 'surface'}`;
 
       // warnings
       const warns = [];
@@ -426,6 +436,12 @@ export class Hud {
   }
 
   drawMarkers(ctx) {
+    const dm = ctx.dropMarker;
+    if (dm && (ctx.showMarker || ctx.cameraMode === 'down')) {
+      this.dropMarker.style.display = 'block';
+      this.dropMarker.style.transform = `translate(${dm.x.toFixed(0)}px, ${dm.y.toFixed(0)}px)`;
+      this.dropMarkerTxt.textContent = `drop point · ${dm.miss.toFixed(1)} m from swimmer`;
+    } else this.dropMarker.style.display = 'none';
     const m = ctx.marker;
     if (m && ctx.showMarker) {
       this.marker.style.display = 'block';

@@ -67,8 +67,9 @@ switches on CH5–CH8) the defaults may already be right; the wizard sorts out a
 | H, C, M, 1–6 | QHOVER, CRUISE, MANUAL, QLOITER, FBWA, AUTO, RTL, QLAND, QRTL |
 | Payload switch / B | Release the flotation device |
 | Keyboard flying | Arrows = pitch/roll, A/D = yaw, W/S = throttle, X = 50 %, Z = 0 |
-| V | Camera: line-of-sight → chase → FPV |
-| Mouse wheel, + / − | Zoom (LOS), distance (chase), tilt (FPV) |
+| V | Camera: line-of-sight → chase → FPV → down (belly) |
+| K | Down camera: gimbal-stabilised / fixed to the airframe |
+| Mouse wheel, + / − | Zoom (LOS, down), distance (chase), tilt (FPV) |
 | O | Aircraft and swimmer markers |
 | P, T, R | Pause, time ×0.5/×1/×2, reset |
 | G, Tab, F1 | Controller setup, settings, help |

@@ -68,7 +68,7 @@ class App {
       startYaw: this.startYaw,
       startMode: this.startMode,
       showMarker: this.showMarker,
-      cam: { losFov: this.cam.losFov, autoZoom: this.cam.autoZoom, fpvTilt: this.cam.fpvTilt, fpvFov: this.cam.fpvFov, pilotNed: this.cam.pilotNed, mode: this.cam.mode },
+      cam: { losFov: this.cam.losFov, autoZoom: this.cam.autoZoom, fpvTilt: this.cam.fpvTilt, fpvFov: this.cam.fpvFov, downFov: this.cam.downFov, downStabilized: this.cam.downStabilized, pilotNed: this.cam.pilotNed, mode: this.cam.mode },
     });
     this.hud.swimmer = this.sim.scenario.swimmer;
   }
@@ -121,6 +121,7 @@ class App {
           else this.setPaused(true, 'user');
           break;
         case 'KeyO': this.showMarker = !this.showMarker; break;
+        case 'KeyK': this.cam.downStabilized = !this.cam.downStabilized; this.persist(); break;
         case 'KeyT': this.timeScale = this.timeScale === 1 ? 2 : this.timeScale === 2 ? 0.5 : 1; break;
         case 'Equal': case 'NumpadAdd': this.cam.zoom(1); break;
         case 'Minus': case 'NumpadSubtract': this.cam.zoom(-1); break;
@@ -155,6 +156,7 @@ class App {
       // keep arm/mode events that happen while a menu is open
       this.sim.pendingEvents = (this.sim.pendingEvents || []).concat(pilot.events);
     }
+    this.world.swimmerMarker.visible = this.showMarker && this.cam.mode !== 'down';
     this.world.update(this.paused ? 0 : dt * this.timeScale, this.sim);
     this.model.fpv = this.cam.mode === 'fpv';
     this.model.update(this.paused ? 0 : dt * this.timeScale, this.sim);
@@ -170,11 +172,21 @@ class App {
     if (this.cam.mode !== 'fpv' || true) {
       const p = this.cam.project(target, w, h);
       const dist = camPos.distanceTo(target);
-      if (p && this.cam.mode !== 'fpv' && dist > 15) marker = { ...p, dist };
+      if (p && this.cam.mode !== 'fpv' && this.cam.mode !== 'down' && dist > 15) marker = { ...p, dist };
       const [sn, se] = this.sim.scenario.swimmer;
       const sp = ned2three([sn, se, 0]);
       const ps = this.cam.project(sp, w, h);
       if (ps && ps.x > 0 && ps.x < w && ps.y > 0 && ps.y < h) swMarker = { ...ps, dist: camPos.distanceTo(sp) };
+    }
+    // predicted landing point of the flotation device if released now
+    let dropMarker = null;
+    const imp = this.sim.predictPayloadImpact();
+    if (imp) {
+      const ip = this.cam.project(ned2three(imp.pos), w, h);
+      if (ip && ip.x > 0 && ip.x < w && ip.y > 0 && ip.y < h) {
+        const [sn2, se2] = this.sim.scenario.swimmer;
+        dropMarker = { ...ip, miss: Math.hypot(imp.pos[0] - sn2, imp.pos[1] - se2), t: imp.time };
+      }
     }
     const tel = this.sim.telemetry();
     const src = this.input.source;
@@ -187,6 +199,8 @@ class App {
       fov: this.cam.camera.fov,
       marker,
       swMarker,
+      dropMarker,
+      downStabilized: this.cam.downStabilized,
       showMarker: this.showMarker,
       paused: this.paused,
       fbwMin: this.sim.fc.p.ARSPD_FBW_MIN,

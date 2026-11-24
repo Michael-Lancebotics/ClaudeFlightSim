@@ -173,6 +173,8 @@ export function openSettings(app) {
     marker: check(app.showMarker),
     fpvTilt: num(cam.fpvTilt, 1, -30, 45),
     fpvFov: num(cam.fpvFov, 1, 60, 130),
+    downStab: check(cam.downStabilized),
+    downFov: num(cam.downFov, 1, 10, 110),
     pilotN: num(cam.pilotNed[0], 1, -60, 30),
     pilotE: num(cam.pilotNed[1], 1, -100, 100),
     yaw: num(app.startYaw, 5, 0, 359),
@@ -184,6 +186,8 @@ export function openSettings(app) {
     field('Aircraft / swimmer markers', d.marker, 'boxes around the aircraft and swimmer (O key)'),
     field('FPV camera tilt (deg)', d.fpvTilt),
     field('FPV field of view (deg)', d.fpvFov),
+    field('Down camera on a gimbal', d.downStab, 'on: always straight down; off: fixed to the airframe (K key)'),
+    field('Down camera field of view (deg)', d.downFov),
     field('Pilot position north of pad (m)', d.pilotN),
     field('Pilot position east of pad (m)', d.pilotE),
     field('Start heading (deg)', d.yaw, '0 = facing the sea'),
@@ -210,6 +214,8 @@ export function openSettings(app) {
     app.showMarker = val(d.marker);
     cam.fpvTilt = val(d.fpvTilt);
     cam.fpvFov = val(d.fpvFov);
+    cam.downStabilized = val(d.downStab);
+    cam.downFov = val(d.downFov);
     cam.pilotNed = [val(d.pilotN), val(d.pilotE)];
     app.startYaw = val(d.yaw);
     app.startMode = val(d.mode);
@@ -621,8 +627,9 @@ export function openHelp(app) {
     <tr><td>Arrows</td><td>Pitch / roll (Shift = full deflection)</td></tr>
     <tr><td>A / D</td><td>Yaw</td></tr>
     <tr><td>B</td><td>Release flotation device</td></tr>
-    <tr><td>V</td><td>Cycle camera: line-of-sight, chase, FPV</td></tr>
-    <tr><td>Mouse wheel or + / -</td><td>Zoom (LOS) / distance (chase) / tilt (FPV)</td></tr>
+    <tr><td>V</td><td>Cycle camera: line-of-sight, chase, FPV, down</td></tr>
+    <tr><td>K</td><td>Down camera: gimbal (straight down) / fixed to the airframe</td></tr>
+    <tr><td>Mouse wheel or + / -</td><td>Zoom (LOS, down) / distance (chase) / tilt (FPV)</td></tr>
     <tr><td>O</td><td>Aircraft & swimmer markers on/off</td></tr>
     <tr><td>P</td><td>Pause · <b>T</b> time x0.5 / x1 / x2</td></tr>
     <tr><td>R</td><td>Reset to the launch pad</td></tr>

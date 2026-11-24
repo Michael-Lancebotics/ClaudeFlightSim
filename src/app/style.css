@@ -154,3 +154,10 @@ h3 { font-size: 14px; margin: 14px 0 6px; color: var(--accent); }
   .field { grid-template-columns: 1fr 120px; }
   .field-hint { grid-column: 1 / -1; }
 }
+
+.hud-dropmarker .hud-marker-box { border-color: rgba(80, 220, 255, 0.95); border-radius: 50%; border-style: dashed; }
+.hud-dropmarker .hud-marker-txt { color: #8be9ff; }
+.hud-cross { position: absolute; left: 50%; top: 50%; display: none; }
+.hud-cross-h { position: absolute; left: -24px; top: -1px; width: 48px; height: 2px; background: rgba(255, 210, 63, 0.85); }
+.hud-cross-v { position: absolute; left: -1px; top: -24px; width: 2px; height: 48px; background: rgba(255, 210, 63, 0.85); }
+.hud-cross-txt { position: absolute; left: 30px; top: 6px; font-size: 12px; color: var(--accent); text-shadow: 0 1px 2px #000; white-space: nowrap; }

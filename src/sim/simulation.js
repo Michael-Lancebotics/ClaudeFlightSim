@@ -209,9 +209,8 @@ export class Simulation {
     this.scenario.onRelease(this.time, { height, speed: norm(vel), pos: pos.slice() });
   }
 
-  updatePayload(dt) {
-    const pl = this.payload;
-    if (!pl || !pl.inAir) return;
+  /** One integration step of a falling payload {pos, vel}; returns true on impact. */
+  stepPayloadBody(pl, dt) {
     const m = this.ac.payloadMass;
     const CdA = 0.035; // tumbling ring buoy / rescue tube
     const h = Math.max(-pl.pos[2] - surfaceHeight(pl.pos[0], pl.pos[1]), 0.3);
@@ -225,11 +224,31 @@ export class Simulation {
     for (let i = 0; i < 3; i++) pl.pos[i] += pl.vel[i] * dt;
     const surf = surfaceHeight(pl.pos[0], pl.pos[1]);
     if (-pl.pos[2] <= surf) {
-      pl.inAir = false;
       pl.pos[2] = -surf;
+      return true;
+    }
+    return false;
+  }
+
+  updatePayload(dt) {
+    const pl = this.payload;
+    if (!pl || !pl.inAir) return;
+    if (this.stepPayloadBody(pl, dt)) {
+      pl.inAir = false;
       const onLand = !isWater(pl.pos[0], pl.pos[1]);
       this.scenario.onSplash(this.time, { pos: pl.pos.slice(), onLand });
     }
+  }
+
+  /** Where the flotation device would land if released right now (NED), or null. */
+  predictPayloadImpact() {
+    const v = this.vehicle;
+    if (!v.payloadAttached) return null;
+    const R = quatToDcm(v.quat);
+    const off = mat3MulVec(R, [0, 0, PAYLOAD_OFFSET]);
+    const pl = { pos: [v.s[0] + off[0], v.s[1] + off[1], v.s[2] + off[2]], vel: v.vel.slice() };
+    for (let t = 0; t < 20; t += 0.02) if (this.stepPayloadBody(pl, 0.02)) return { pos: pl.pos, time: t };
+    return null;
   }
 
   // ---------------------------------------------------------------- crash detection

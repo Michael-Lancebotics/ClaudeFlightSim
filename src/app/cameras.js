@@ -4,10 +4,18 @@
 import * as THREE from 'three';
 import { groundHeight } from '../core/terrain.js';
 
-export const CAMERA_MODES = ['los', 'chase', 'fpv'];
-export const CAMERA_LABELS = { los: 'LINE OF SIGHT (pilot on the beach)', chase: 'CHASE', fpv: 'FPV (nose camera)' };
+export const CAMERA_MODES = ['los', 'chase', 'fpv', 'down'];
+export const CAMERA_LABELS = { los: 'LINE OF SIGHT (pilot on the beach)', chase: 'CHASE', fpv: 'FPV (nose camera)', down: 'DOWN CAMERA (belly)' };
 
 // body (FRD) -> three camera frame (camera looks down its -Z, +Y up)
+// body (FRD) -> camera looking straight down the body z axis, nose at the top of the image
+const B_DOWN = new THREE.Matrix4().set(
+  0, 1, 0, 0,
+  1, 0, 0, 0,
+  0, 0, -1, 0,
+  0, 0, 0, 1,
+);
+
 const B_CAM = new THREE.Matrix4().set(
   0, 0, -1, 0,
   1, 0, 0, 0,
@@ -23,6 +31,8 @@ export class CameraRig {
     this.autoZoom = false;
     this.fpvTilt = 0; // deg, positive = camera tilted up
     this.fpvFov = 100;
+    this.downFov = 70;
+    this.downStabilized = true; // gimbal keeps it pointing straight down
     this.chaseDist = 7;
     this.chaseHeight = 2.2;
     this.orbit = 0; // chase-camera orbit offset (rad)
@@ -44,6 +54,7 @@ export class CameraRig {
   zoom(dir) {
     if (this.mode === 'los') this.losFov = THREE.MathUtils.clamp(this.losFov * (dir > 0 ? 0.85 : 1 / 0.85), 3, 75);
     else if (this.mode === 'chase') this.chaseDist = THREE.MathUtils.clamp(this.chaseDist * (dir > 0 ? 0.85 : 1 / 0.85), 2.5, 60);
+    else if (this.mode === 'down') this.downFov = THREE.MathUtils.clamp(this.downFov * (dir > 0 ? 0.85 : 1 / 0.85), 10, 110);
     else this.fpvTilt = THREE.MathUtils.clamp(this.fpvTilt + (dir > 0 ? 5 : -5), -30, 45);
   }
 
@@ -94,6 +105,23 @@ export class CameraRig {
         cam.updateProjectionMatrix();
       }
       void v;
+    } else if (this.mode === 'down') {
+      // belly camera, under the forward fuselage (clear of the payload and skids)
+      const pos = new THREE.Vector3(0.25, 0, 0.09).applyMatrix4(model.root.matrix);
+      cam.position.copy(pos);
+      if (this.downStabilized) {
+        // gimbal: straight down, aircraft heading at the top of the image
+        const yaw = sim.vehicle ? sim.est.yaw : 0;
+        cam.up.set(Math.sin(yaw), 0, -Math.cos(yaw));
+        cam.lookAt(pos.x, pos.y - 10, pos.z);
+      } else {
+        const m = new THREE.Matrix4().multiplyMatrices(model.root.matrix, B_DOWN);
+        cam.quaternion.setFromRotationMatrix(m);
+      }
+      if (cam.fov !== this.downFov) {
+        cam.fov = this.downFov;
+        cam.updateProjectionMatrix();
+      }
     } else {
       // FPV: camera rigidly on the nose
       const m = new THREE.Matrix4().multiplyMatrices(model.root.matrix, B_CAM);
