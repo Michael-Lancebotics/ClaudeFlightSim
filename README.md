@@ -13,6 +13,10 @@ It reproduces your flow5 dynamic modes to within 1–2 % (see [Validation](#vali
 
 ## Run it (Windows 10)
 
+**Online:** https://michael-lancebotics.github.io/ClaudeFlightSim/ (GitHub Pages, published from the `gh-pages`
+branch with `tools/publish-pages.sh`).
+
+**Offline:**
 1. Download **`ClaudeFlightSim.html`** from this branch. On GitHub: open the file → **Download raw file**.
 2. Double-click it. It opens in Chrome or Edge, with nothing to install and no internet needed.
 3. Click **Help** (or press F1) for the controls.
