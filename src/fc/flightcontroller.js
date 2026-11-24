@@ -45,6 +45,7 @@ export class FlightController {
   reset() {
     this.time = 0;
     this.armed = false;
+    this.crashed = false;
     this.mode = 'QLOITER';
     this.phase = 'vtol'; // vtol | trans_wait | trans_timer | fw
     this.transStart = 0;

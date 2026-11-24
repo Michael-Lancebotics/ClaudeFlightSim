@@ -94,3 +94,16 @@ test('QLAND descends and disarms on touchdown', () => {
   assert.equal(sim.crash, null);
   assert.equal(sim.fc.armed, false);
 });
+
+test('after a crash, reset allows arming again', () => {
+  const sim = new Simulation({ env: { windSpeed: 0, gustAmp: 0, turbulence: 'off' } });
+  sim.reset({ mode: 'QHOVER' });
+  fly(sim, 0.1, { events: [{ type: 'arm' }] });
+  fly(sim, 6, { throttle: 0.9 });
+  fly(sim, 10, { throttle: 0.5, events: [{ type: 'disarm' }] });
+  assert.ok(sim.crash, 'crashed');
+  sim.reset({ mode: 'QLOITER' });
+  assert.equal(sim.crash, null);
+  fly(sim, 0.1, { events: [{ type: 'arm' }] });
+  assert.equal(sim.fc.armed, true, 'armed after reset');
+});
