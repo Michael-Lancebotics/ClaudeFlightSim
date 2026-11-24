@@ -1,0 +1,20 @@
+{
+  "name": "claude-flight-sim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser flight simulator for a lifeguard-rescue ArduPilot QuadPlane, with a physics core reusable as an ArduPilot SITL JSON backend.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build": "node tools/build.mjs",
+    "dev": "node tools/build.mjs --serve",
+    "validate": "node tools/validate.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}
