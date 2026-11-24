@@ -1,0 +1,46 @@
+# Starting parameters for flying the simulator's physics with REAL ArduPilot
+# (ArduPlane SITL, JSON backend: node tools/sitl-bridge.mjs). See docs/SITL.md.
+#
+# Parameter names are for ArduPlane 4.5+. Older firmware uses ARSPD_FBW_MIN /
+# ARSPD_FBW_MAX / TRIM_ARSPD_CM (cm/s) instead of AIRSPEED_MIN / AIRSPEED_MAX /
+# AIRSPEED_CRUISE. Check every value against your firmware's parameter list;
+# SITL just warns about names it does not know.
+
+# --- QuadPlane frame: 4 lift motors, Quad-X order (1 FR CCW, 2 RL CCW, 3 FL CW, 4 RR CW)
+Q_ENABLE        1
+Q_FRAME_CLASS   1
+Q_FRAME_TYPE    1
+
+# --- outputs (must match the bridge's channel map)
+SERVO1_FUNCTION 4      # aileron (both ailerons on one channel)
+SERVO2_FUNCTION 79     # V-tail left ruddervator
+SERVO3_FUNCTION 70     # throttle -> pusher
+SERVO4_FUNCTION 80     # V-tail right ruddervator
+SERVO5_FUNCTION 33     # motor 1
+SERVO6_FUNCTION 34     # motor 2
+SERVO7_FUNCTION 35     # motor 3
+SERVO8_FUNCTION 36     # motor 4
+SERVO9_FUNCTION 28     # gripper -> flotation device release
+GRIP_ENABLE     1
+GRIP_TYPE       1
+GRIP_GRAB       1100
+GRIP_RELEASE    1900
+
+# --- speeds from the design data
+AIRSPEED_MIN    20     # transition / min fixed-wing airspeed (1.2 x 16.7 m/s stall)
+AIRSPEED_MAX    30
+AIRSPEED_CRUISE 20.8
+Q_ASSIST_SPEED  16     # design value; the simulator suggests 17-18 (stall is 16.7 m/s)
+Q_TRANSITION_MS 1500
+Q_TRANS_DECEL   1.5    # 2.0 overshoots the swimmer by ~60 m in the simulator
+Q_RTL_MODE      1      # RTL flies fixed-wing home then VTOL lands
+
+# --- limits
+THR_MAX         80     # keeps the static pusher current near the 85 A motor rating
+LIM_ROLL_CD     4500
+Q_ANGLE_MAX     3000
+
+# --- battery 6S2P 13 Ah
+BATT_CAPACITY   13000
+BATT_LOW_VOLT   21.0
+BATT_CRT_VOLT   20.4

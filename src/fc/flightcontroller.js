@@ -140,6 +140,7 @@ export class FlightController {
     this.armed = true;
     this.armTime = this.time;
     this.landed = !!e.onGround;
+    this.landedTimer = 0;
     this.home = [e.pos[0], e.pos[1]];
     this.vAtt.reset();
     this.vPos.reset();
@@ -357,6 +358,7 @@ export class FlightController {
       this.landedTimer += dt;
       if (this.landedTimer > 0.3) {
         this.landed = true;
+        this.landedTimer = 0;
         this.msg('Landed');
       }
     } else {
@@ -364,8 +366,11 @@ export class FlightController {
     }
     if (this.landed) {
       this.altT = est.alt;
-      this.landedTimer += dt;
-      if (climb <= 0 && this.landedTimer > p.LAND_DISARMDELAY) this.disarm(landing ? 'landed' : 'auto disarm');
+      // auto-disarm: after a landing, or after 10 s sitting on the ground with the throttle low
+      const lowThr = pilot.throttle < 0.1;
+      this.landedTimer += landing || lowThr ? dt : 0;
+      const delay = landing ? p.LAND_DISARMDELAY : 10;
+      if ((landing || lowThr) && this.landedTimer > delay) this.disarm(landing ? 'landed' : 'auto disarm');
     } else {
       this.altT += climb * dt;
       this.altT = clamp(this.altT, est.alt - 3, est.alt + 3);

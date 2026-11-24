@@ -235,6 +235,8 @@ export class InputManager {
       this.switchState = sw;
       pilot.rcOk = true;
     } else {
+      const kbFlying = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyS', 'KeyA', 'KeyD'].some((k) => this.keys.has(k));
+      if (this.source === 'radio' && kbFlying) this.forgetRadio(); // pilot took over on the keyboard
       if (this.source === 'radio') {
         // radio was in use and disappeared -> radio failsafe
         pilot = { ...this.lastPilot, rcOk: false };
