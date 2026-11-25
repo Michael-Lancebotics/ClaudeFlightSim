@@ -1,5 +1,7 @@
 # QuadPlane Rescue Sim
 
+**▶ Fly it in your browser: [michael-lancebotics.github.io/ClaudeFlightSim](https://michael-lancebotics.github.io/ClaudeFlightSim/)**
+
 A browser flight simulator for the lifeguard-rescue QuadPlane. You fly it with
 your RadioMaster Pocket, using ArduPlane-style modes (QLOITER, QHOVER, FBWA,
 CRUISE, AUTO, RTL, QRTL, QLAND, MANUAL) over a beach with a swimmer 800 m offshore.
@@ -13,7 +15,7 @@ It reproduces your flow5 dynamic modes to within 1–2 % (see [Validation](#vali
 
 ## Run it (Windows 10)
 
-**Online:** https://michael-lancebotics.github.io/ClaudeFlightSim/ (GitHub Pages, published from the `gh-pages`
+**Online:** [michael-lancebotics.github.io/ClaudeFlightSim](https://michael-lancebotics.github.io/ClaudeFlightSim/) (GitHub Pages, published from the `gh-pages`
 branch with `tools/publish-pages.sh`).
 
 **Offline:**
