@@ -107,3 +107,13 @@ test('after a crash, reset allows arming again', () => {
   fly(sim, 0.1, { events: [{ type: 'arm' }] });
   assert.equal(sim.fc.armed, true, 'armed after reset');
 });
+
+test('absurd saved wind settings are clamped and do not crash the parked aircraft', () => {
+  const sim = new Simulation({ env: { windSpeed: 100, gustAmp: 50 } });
+  sim.reset({ mode: 'QLOITER' });
+  assert.equal(sim.envSettings.windSpeed, 20);
+  assert.equal(sim.envSettings.gustAmp, 10);
+  fly(sim, 5);
+  assert.equal(sim.crash, null, sim.crash && sim.crash.detail);
+  assert.ok(!sim.fc.messages.some((m) => m.text.startsWith('CRASH')));
+});

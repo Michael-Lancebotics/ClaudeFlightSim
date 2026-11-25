@@ -43,7 +43,23 @@ export class Simulation {
     return this.envSettings.useDesignDensity ? this.ac.aero.rhoAnalysis : airDensity(this.envSettings.temperatureC, 0);
   }
 
+  /** Keep user-entered environment values inside sane limits. */
+  sanitizeEnv() {
+    const e = this.envSettings;
+    const lim = (k, lo, hi) => {
+      const v = Number(e[k]);
+      e[k] = Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : DEFAULT_ENV[k];
+    };
+    lim('windSpeed', 0, 20);
+    lim('windFromDeg', 0, 360);
+    lim('gustAmp', 0, 10);
+    lim('temperatureC', -20, 50);
+    lim('dragMultiplier', 0.5, 2);
+    if (!['off', 'light', 'moderate', 'severe'].includes(e.turbulence)) e.turbulence = DEFAULT_ENV.turbulence;
+  }
+
   applyEnv() {
+    this.sanitizeEnv();
     const e = this.envSettings;
     Object.assign(this.wind.settings, {
       speed: e.windSpeed,
@@ -295,8 +311,10 @@ export class Simulation {
       }
     }
     this.contactPrev = cur;
-    if (g > 8) crash('Structural failure', `load factor ${g.toFixed(1)} g`);
-    if (airspeed > 42) crash('Structural failure', `overspeed ${airspeed.toFixed(0)} m/s`);
+    // structural limits apply in flight (a parked aircraft is judged by the contact checks)
+    const airborne = !est.onGround && est.hagl > 0.5;
+    if (airborne && g > 8) crash('Structural failure', `load factor ${g.toFixed(1)} g`);
+    if (airborne && airspeed > 42) crash('Structural failure', `overspeed ${airspeed.toFixed(0)} m/s`);
   }
 
   /** Telemetry snapshot for the HUD. */
